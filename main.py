@@ -3,7 +3,8 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-
+import tkinter as tk
+from tkinter import *
 import pygame
 import random
 import sys
@@ -19,14 +20,21 @@ world = pygame.display.set_mode([worldx, worldy])
 pygame.init()
 
 width = 1000
-height = 1000
+height = 800
 vel = 10
 
 # random position for the object
 # x = 200
+# starting from first grid block
 x = random.randrange(0, worldy)
 y = 200
 segments = 5
+
+segment_width = int(width / segments)
+segment_height = int(height / segments)
+
+current_x_index = 0
+current_y_index = 0
 
 moves_count = 0
 # random position in line
@@ -60,13 +68,26 @@ screen.blit(section_header, (width - 22, 0))
 
 # %%
 
-def draw_grid():
+def on_screen_resize():
+    global segment_width
+    global segment_height
+
     segment_width = int(width / segments)
     segment_height = int(height / segments)
 
+
+def draw_grid():
+    global x
+    global y
+
+    # set object starting in the middle of the box-segment
+    x = current_x_index * segment_width + (segment_width / 2)
+    y = current_y_index * segment_height + (segment_height / 2)
+
     for width_x in range(segments):
         for height_y in range(segments):
-            rect = pygame.Rect(width_x * (segment_width + 1), height_y * (segment_height + 1), segment_width, segment_height)
+            rect = pygame.Rect(width_x * (segment_width + 1), height_y * (segment_height + 1), segment_width,
+                               segment_height)
             pygame.draw.rect(screen, yellow, rect)
 
 
@@ -79,45 +100,42 @@ while True:
             width = event.w
             height = event.h
             print('resize', width, height)
+            on_screen_resize()
             draw_grid()
-    # screen.fill(black)
-    # ball_obj = ball_obj.move(speed)
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT and x > 0:
+                print('key left', x, y)
+                # decrement in x co-ordinate
+                x -= segment_width
+                current_x_index -= 1
+                moves_count += 1
+            if event.key == pygame.K_RIGHT and x < width:
+                print('key right', x, y)
+                # increment in x co-ordinate
+                x += segment_width
+                current_x_index += 1
+                moves_count += 1
+            if event.key == pygame.K_UP and y > 0:
+                print('key up', x, y)
+                # decrement in y co-ordinate
+                y -= segment_height
 
-    # stores keys pressed
-    keys = pygame.key.get_pressed()
+                current_y_index -= 1
+                moves_count += 1
+                # if left arrow key is pressed
+            if event.key == pygame.K_DOWN and y < height:
+                print('key down', x, y)
+                # increment in y co-ordinate
+                y += segment_height
 
-    # if left arrow key is pressed
-    if keys[pygame.K_LEFT] and x > 0:
-        print('key left')
-        # decrement in x co-ordinate
-        x -= vel
-        moves_count += 1
+                current_y_index += 1
+                moves_count += 1
 
-        # if left arrow key is pressed
-    if keys[pygame.K_RIGHT] and x < width:
-        print('key right', x, y)
-
-        # increment in x co-ordinate
-        x += vel
-        moves_count += 1
-
-        # if left arrow key is pressed
-    if keys[pygame.K_UP] and y > 0:
-        print('key up', x, y)
-        # decrement in y co-ordinate
-        y -= vel
-        moves_count += 1
-        # if left arrow key is pressed
-    if keys[pygame.K_DOWN] and y < height:
-        print('key down', x, y)
-        # increment in y co-ordinate
-        y += vel
-        moves_count += 1
-
+    # draw the object
     circle = pygame.draw.circle(surface=screen, color=red, center=[x, y], radius=30)
 
     # target
-    target = pygame.draw.rect(screen, yellow, (target_x, target_y, 80, 20))
+    target = pygame.draw.rect(screen, green, (target_x, target_y, 80, 20))
 
     collide = pygame.Rect.colliderect(circle,
                                       target)
