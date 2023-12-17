@@ -103,19 +103,19 @@ while True:
             on_screen_resize()
             draw_grid()
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT and x > 0:
-                print('key left', x, y)
+            if event.key == pygame.K_LEFT and segments >= current_x_index > 0:
                 # decrement in x co-ordinate
                 x -= segment_width
                 current_x_index -= 1
                 moves_count += 1
-            if event.key == pygame.K_RIGHT and x < width:
-                print('key right', x, y)
+                print('key left', current_x_index, current_y_index)
+            if event.key == pygame.K_RIGHT and (segments-1) > current_x_index:
                 # increment in x co-ordinate
                 x += segment_width
                 current_x_index += 1
                 moves_count += 1
-            if event.key == pygame.K_UP and y > 0:
+                print('key right', current_x_index, current_y_index)
+            if event.key == pygame.K_UP and segments >= current_y_index > 0:
                 print('key up', x, y)
                 # decrement in y co-ordinate
                 y -= segment_height
@@ -123,7 +123,7 @@ while True:
                 current_y_index -= 1
                 moves_count += 1
                 # if left arrow key is pressed
-            if event.key == pygame.K_DOWN and y < height:
+            if event.key == pygame.K_DOWN and (segments-1) > current_y_index:
                 print('key down', x, y)
                 # increment in y co-ordinate
                 y += segment_height
